@@ -1,0 +1,58 @@
+spring:
+  profiles:
+        active:
+            - local
+        include: common
+  datasource:
+    url: jdbc:postgresql://localhost:5432/characterdeveloper
+    username: postgres
+    password: postgres
+    platform: POSTGRESQL
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+    generate-ddl: true
+    show-sql: true
+    properties:
+      hibernate:
+        use-new-id-generator-mappings: false
+        default_schema: public
+        dialect: org.hibernate.dialect.PostgreSQL9Dialect
+        connection.pool_size: 10
+        ## create-drop dropea al cierre del session factory de hibernate. create solo dropea al iniciar
+        ddl-auto: validate
+        # Para debugear el log de hibernate en desarrollo, en prod se debería sacar o va a generar mucho ruido en la consola
+        generate_statistics: false
+        format_sql: true
+#       Esta conf hace que no aparezca un error cuando hibernate intenta ver cuales features soporta la DB
+#       Según un comentario en SO puede generar problemas de commits innecesarios en Oracle. No se que pasa con Postgres
+        temp.use_jdbc_metadata_defaults: false
+        jdbc.lob.non_contextual_creation: true
+  logging:
+    level:
+     # Para debugear el log de hibernate en desarrollo, en prod se debería sacar o va a generar muchos logs
+      org.hibernate:
+        sql: ERROR
+        type: trace
+        stat: debug
+  security:
+     jwtSecret: JWTSuperSecretKey
+     jwtExpirationInMs: 604800000
+  data.rest.base-path: /api
+  resources.static-locations: file:build,classpath:/public, classpath:/static
+server.port: 8080
+
+---
+spring:
+  profiles: produccion
+base:
+  url: https://www.character-developer.com/
+---
+spring:
+  profiles: staging
+base:
+  url: http://testing.character-developer.com/
+---
+spring:
+  profiles: local
+base:
+  url: localhost:8080/
